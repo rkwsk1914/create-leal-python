@@ -1,7 +1,7 @@
 default_fps = 30
 base_duration = 0.2
 
-default_page_last_pose = 5
+default_page_last_pose = 1
 
 bg_image_path = "asset/bg.png"
 
