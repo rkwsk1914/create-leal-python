@@ -1,0 +1,48 @@
+[
+  {
+    "lead_title": [
+      "ようこそ！",
+      "自己紹介"
+    ],
+    "chara_type": "surprised",
+    "chara_animation": "jump",
+    "content": [
+      {
+        "title": "次へ",
+        "chara_type": "understand",
+        "chara_animation": "none",
+        "content": [
+          "準備はいいですか？",
+          "次に進みましょう。"
+        ]
+      },
+      {
+        "title": "次へ",
+        "chara_type": "listen",
+        "chara_animation": "none",
+        "content": [
+          "準備はいいですか？",
+          "add_asset/maru.png"
+        ]
+      },
+      {
+        "title": "次へ",
+        "chara_type": "understand",
+        "chara_animation": "none",
+        "content": [
+          "準備はいいですか？",
+          "次に進みましょう。"
+        ]
+      },
+      {
+        "title": "最後",
+        "chara_type": "agree",
+        "chara_animation": "jump",
+        "content": [
+          "準備はいいですか？",
+          "次に進みましょう。"
+        ]
+      }
+    ]
+  }
+]
