@@ -102,7 +102,6 @@ def slide_in_text(
                     bg_clip = ImageClip(np.array(final_bg)).set_duration(slide_duration)
                     clips.append(CompositeVideoClip([bg_clip, animated_clip], size=(w, h)))
 
-                # 背景に文字描画（常に行う）
                 draw_final = ImageDraw.Draw(final_bg)
                 x_cursor = final_x
                 for char, underline in line:
@@ -120,9 +119,13 @@ def slide_in_text(
 
         elif isinstance(item, dict) and "image" in item:
             image = Image.open(item["image"]).convert("RGBA")
+            original_w, original_h = image.size
+            resize_w = max_text_width_narrow
+            resize_h = int(original_h * (resize_w / original_w))
+            image = image.resize((resize_w, resize_h), Image.LANCZOS)
             img_w, img_h = image.size
+
             y = start_y + line_offset * line_height
-            final_bg.paste(image, (final_x, y), image)
 
             if with_animation:
                 image_clip = ImageClip(np.array(image)).set_duration(slide_duration)
@@ -136,9 +139,9 @@ def slide_in_text(
                 bg_clip = ImageClip(np.array(final_bg)).set_duration(slide_duration)
                 clips.append(CompositeVideoClip([bg_clip, animated_clip], size=(w, h)))
 
-            line_offset += 1
+            final_bg.paste(image, (final_x, y), image)
+            line_offset += int(np.ceil(img_h / line_height))
 
-    # ✅ 下線アニメーション または 静的描画
     for info in underline_infos:
         for start_x, end_x, y_pos in info["positions"]:
             width = end_x - start_x
@@ -157,7 +160,6 @@ def slide_in_text(
                     )
                     clips.append(ImageClip(np.array(underline_img)).set_duration(underline_frame_duration))
 
-            # 最終状態の下線は常に描画
             draw_final = ImageDraw.Draw(final_bg)
             draw_final.line(
                 [(start_x, underline_y), (start_x + width, underline_y)],
@@ -165,6 +167,5 @@ def slide_in_text(
                 width=underline_width
             )
 
-    # ✅ 最終状態保持
     clips.append(ImageClip(np.array(final_bg)).set_duration(last_pose))
     return concatenate_videoclips(clips, method="compose"), final_bg
