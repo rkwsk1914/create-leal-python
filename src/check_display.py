@@ -30,13 +30,13 @@ def build_video(scenes, transition_duration=0.3, fps=default_fps, output_path="d
     final.write_videofile(output_path, fps=fps)
 
 # ===== 引数チェック =====
-if len(sys.argv) < 3:
-    print("エラー: JSONファイルパスと出力ファイル名を指定してください")
-    print("使用例: python src/index.py data/content.json dist/output.mp4")
-    sys.exit(1)
+# if len(sys.argv) < 3:
+#     print("エラー: JSONファイルパスと出力ファイル名を指定してください")
+#     print("使用例: python src/index.py data/content.json dist/output.mp4")
+#     sys.exit(1)
 
 json_path = sys.argv[1]
-output_path = sys.argv[2]
+# output_path = sys.argv[2]
 
 # ===== JSON を読み込む =====
 try:
@@ -69,4 +69,4 @@ for content_item in contents:
         scenes.append(make_block_func())
 
 # ===== 動画出力 =====
-build_video(scenes, output_path=output_path)
+build_video(scenes, output_path="check/check.mp4")

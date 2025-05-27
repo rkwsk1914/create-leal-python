@@ -1,6 +1,6 @@
 import sys
 import json
-from moviepy.editor import concatenate_videoclips
+from moviepy.editor import concatenate_videoclips, vfx
 from scene_top import generate_scene_top
 from generate_scene import generate_scene
 from my_transitions import make_page_flip
@@ -27,6 +27,7 @@ def build_video(scenes, transition_duration=0.3, fps=default_fps, output_path="d
             clips.extend([transition, next_main])
 
     final = concatenate_videoclips(clips, method="compose")
+    final = final.fx(vfx.speedx, factor=1.5)
     final.write_videofile(output_path, fps=fps)
 
 # ===== 引数チェック =====
