@@ -44,7 +44,7 @@ def generate_scene(
         start_x=100,
         start_y=470,
         max_text_width=880,
-        with_animation=with_animation,
+        #with_animation=with_animation,
     )
 
     # 💡 Y座標で narrow_after_lines の判定を動的に行う
@@ -67,7 +67,7 @@ def generate_scene(
         max_text_width=max_text_width,
         font_size=font_size,
         last_pose=page_last_pose,
-        with_animation=with_animation,
+        #with_animation=with_animation,
     )
 
     os.makedirs("dist", exist_ok=True)

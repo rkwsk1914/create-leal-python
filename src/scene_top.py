@@ -34,7 +34,7 @@ def generate_scene_top(
         start_y = 506,
         max_text_width = 800,
         last_pose=1,
-        with_animation=with_animation
+        #with_animation=with_animation
     )
 
     os.makedirs("dist", exist_ok=True)
