@@ -48,10 +48,11 @@ def slide_in_text(
     final_x=100,
     font_color=(85, 85, 85, 255),
     last_pose=default_page_last_pose,
-    underline_fill=(123, 182, 255, int(255 * 0.1)), #(251, 141, 141, 255),
+    underline_fill=(254, 171, 36, int(255 * 1)), #(123, 182, 255, int(255 * 1)), #(251, 141, 141, 255),
     underline_width=20,
     underline_anim_duration=0.03,
-    underline_frame_duration=0.03
+    underline_frame_duration=0.03,
+    underline_offset_y = 12
 ):
     font = ImageFont.truetype(font_path, font_size)
     w, h = bg_copy.size
@@ -147,14 +148,21 @@ def slide_in_text(
                 underline_img = final_bg.copy()
                 draw = ImageDraw.Draw(underline_img)
                 curr_width = int(width * (i / frames))
-                draw.rectangle(
-                    [start_x, y_pos, start_x + curr_width, y_pos + underline_width],
-                    fill=underline_fill
+                underline_y = y_pos + underline_offset_y
+
+                draw.line(
+                    [(start_x, underline_y), (start_x + curr_width, underline_y)],
+                    fill=underline_fill,
+                    width=underline_width
                 )
                 clips.append(ImageClip(np.array(underline_img)).set_duration(underline_frame_duration))
 
             draw_final = ImageDraw.Draw(final_bg)
-            draw_final.rectangle([start_x, y_pos, end_x, y_pos + underline_width], fill=underline_fill)
+            draw_final.line(
+                [(start_x, underline_y), (start_x + curr_width, underline_y)],
+                fill=underline_fill,
+                width=underline_width
+            )
 
     clips.append(ImageClip(np.array(final_bg)).set_duration(last_pose))
     return concatenate_videoclips(clips, method="compose"), final_bg

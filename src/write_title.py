@@ -2,7 +2,7 @@ from typing import List
 from moviepy.editor import ImageClip, CompositeVideoClip, concatenate_videoclips
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
-from setting import base_duration, font_path
+from setting import base_duration, font_path, pencil_padding
 
 duration_per_char = 0.1
 underline_anim_duration = base_duration
@@ -69,8 +69,12 @@ def write_title(
                     composite = bg_clip.set_duration(duration_per_char)
                 elif i < len(line_text):
                     pencil_x = start_x + text_width
-                    pencil_y = y
-                    print(f"[DEBUG] pencil_y = {pencil_y}")
+                    pencil_y = y - pencil_padding + ((line_height - font_size) / 2) + (font_size / 4)
+                    # print(f"[DEBUG] font_size = {font_size}")
+                    # print(f"[DEBUG] line_height = {line_height}")
+                    # print(f"[DEBUG] y = {y}")
+                    # print(f"[DEBUG] pencil_y = {pencil_y}")
+                    # print(f"[DEBUG]")
                     pencil_clip = ImageClip(pencil_path).set_position((pencil_x, pencil_y)).set_duration(duration_per_char)
                     composite = CompositeVideoClip([bg_clip.set_duration(duration_per_char), pencil_clip], size=(w, h))
                 else:
