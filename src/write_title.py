@@ -110,4 +110,5 @@ def write_title(
             line_offset += 1
 
     final = concatenate_videoclips(clips, method="compose")
-    return final, bg_with_text  # ✅ アニメーション + 最終状態の背景画像
+    last_y = start_y + line_offset * line_height  # 追加
+    return final, bg_with_text, last_y  # ✅ アニメーション + 最終状態の背景画像

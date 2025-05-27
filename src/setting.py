@@ -3,6 +3,8 @@ base_duration = 0.2
 
 default_page_last_pose = 1
 
+note_line_heigh = 114
+
 bg_image_path = "asset/bg.png"
 
 font_path = "M_PLUS_Rounded_1c/MPLUSRounded1c-Medium.ttf"

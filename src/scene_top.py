@@ -20,11 +20,11 @@ def generate_scene_top(
         character_type=character_type,
         chara_animation=chara_animation,
     )
-    final, b = write_title(
+    final, _ ,_ = write_title(
         intro_clip = character_intro,
         lines = title,
         bg_copy = bg_with_character,
-        font_size = 160,
+        font_size = 128,
         line_height = 220,
         start_x = 100,
         start_y = 506,
