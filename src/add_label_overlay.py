@@ -10,8 +10,8 @@ def add_label_overlay(
     leal_title=None,
     leal_number_font_size=72,
     leal_title_font_size=40,
-    position=(100, 205),
-    font_color=(85, 85, 85, 255),
+    position=(50, 205),
+    font_color=(165, 188, 221, 255),
 ):
     """
     背景画像にラベル文字（leal_number だけ または leal_number - leal_title_str -）を合成して返す（PIL.Image）
