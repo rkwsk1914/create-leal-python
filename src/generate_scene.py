@@ -48,8 +48,8 @@ def generate_scene(
     adjusted_start_y = 660
     narrow_check_point_y = 697
 
-    print(f"[DEBUG] title_end_y = {title_end_y}")
-    print(f"[DEBUG] narrow_check_point_y = {narrow_check_point_y}")
+    #print(f"[DEBUG] title_end_y = {title_end_y}")
+    #print(f"[DEBUG] narrow_check_point_y = {narrow_check_point_y}")
 
     if title_end_y >= narrow_check_point_y:
         adjusted_start_y = 660 + note_line_heigh + 2
@@ -86,4 +86,4 @@ if __name__ == "__main__":
         #     # {"image": "add_asset/maru.png"},
         # ]
     )
-    final.write_videofile("dist/scene_one_5.mp4", fps=default_fps)
+    final.write_videofile("dist/scene_one_6.mp4", fps=default_fps)
