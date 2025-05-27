@@ -22,7 +22,7 @@
         "chara_animation": "none",
         "content": [
           "準備はいいですか？",
-          "add_asset/maru.png"
+          {"image": "add_asset/maru.png"}
         ]
       },
       {

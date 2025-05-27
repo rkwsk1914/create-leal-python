@@ -48,6 +48,11 @@ if __name__ == "__main__":
         character_type="agree",
         chara_animation="none",
         title=["それって"],
-        contents=["ああ", "いい", "ううううううう", "add_asset/maru.png"]
+        contents=[
+        "これは下**線付きであああああああ**あああす",
+        "これは普通の行",
+        "**複数**の**強調**もOK",
+        {"image": "add_asset/maru.png"},
+        ]
     )
     final.write_videofile("dist/scene_one.mp4", fps=default_fps)
