@@ -33,13 +33,14 @@ def write_title(
     start_x=100,
     start_y=506,
     max_text_width=800,
-    underline_color = (251, 141, 141, int(255 * 100)),
-    font_color = (85, 85, 85, 255),
-    last_pose = 0.2
+    underline_color=(251, 141, 141, int(255 * 1)),
+    font_color=(85, 85, 85, 255),
+    last_pose=0.2,
+    with_animation=True  # ✅ 追加
 ):
     font = ImageFont.truetype(font_path, font_size)
     w, h = bg_copy.size
-    clips = [intro_clip]
+    clips = [intro_clip] if with_animation else []
     prev_line_states = []
     line_offset = 0
     line_total = sum(len(split_text_by_width(l, font, max_text_width)) for l in lines)
@@ -50,39 +51,48 @@ def write_title(
 
         for line_text in wrapped_lines:
             current_line_num += 1
+            y = start_y + line_height * line_offset
+            bg = bg_copy.copy()
+            for img in prev_line_states:
+                bg = Image.alpha_composite(bg, img)
 
+            draw = ImageDraw.Draw(bg)
+            draw.text((start_x, y), line_text, font=font, fill=font_color)
+
+            underline_y = y + font_size + 10
+            full_text_width = draw.textlength(line_text, font=font)
+            draw.rectangle([start_x, underline_y, start_x + full_text_width, underline_y + 30], fill=underline_color)
+
+            bg_with_text = bg.copy()
+            prev_line_states.append(bg_with_text)
+
+            if not with_animation:
+                line_offset += 1
+                continue
+
+            # 1文字ずつ描画（アニメーション）
             for i in range(len(line_text) + 1):
-                bg = bg_copy.copy()
-                for img in prev_line_states:
-                    bg = Image.alpha_composite(bg, img)
+                frame = bg_copy.copy()
+                for img in prev_line_states[:-1]:
+                    frame = Image.alpha_composite(frame, img)
 
-                draw = ImageDraw.Draw(bg)
-                y = start_y + line_height * line_offset
+                draw_frame = ImageDraw.Draw(frame)
                 visible_text = line_text[:i]
-                text_width = draw.textlength(visible_text, font=font)
-                draw.text((start_x, y), visible_text, font=font, fill=font_color)
+                draw_frame.text((start_x, y), visible_text, font=font, fill=font_color)
 
-                bg_np = np.array(bg)
+                bg_np = np.array(frame)
                 bg_clip = ImageClip(bg_np)
 
                 if i == 0:
                     composite = bg_clip.set_duration(duration_per_char)
                 elif i < len(line_text):
-                    pencil_x = start_x + text_width
+                    pencil_x = start_x + draw_frame.textlength(visible_text, font=font)
                     pencil_y = y - pencil_padding + ((line_height - font_size) / 2) + (font_size / 4)
-                    # print(f"[DEBUG] font_size = {font_size}")
-                    # print(f"[DEBUG] line_height = {line_height}")
-                    # print(f"[DEBUG] y = {y}")
-                    # print(f"[DEBUG] pencil_y = {pencil_y}")
-                    # print(f"[DEBUG]")
                     pencil_clip = ImageClip(pencil_path).set_position((pencil_x, pencil_y)).set_duration(duration_per_char)
                     composite = CompositeVideoClip([bg_clip.set_duration(duration_per_char), pencil_clip], size=(w, h))
                 else:
-                    underline_y = y + font_size + 10
-                    full_text_width = draw.textlength(line_text, font=font)
+                    # 下線アニメーション
                     n_frames = int(underline_anim_duration / duration_per_char)
-
-                    underline_img = None
                     for j in range(1, n_frames + 1):
                         underline_img = bg.copy()
                         underline_draw = ImageDraw.Draw(underline_img)
@@ -91,29 +101,26 @@ def write_title(
                             [start_x, underline_y, start_x + curr_width, underline_y + 30],
                             fill=underline_color
                         )
-                        u_np = np.array(underline_img)
-                        u_clip = ImageClip(u_np).set_duration(duration_per_char)
+                        u_clip = ImageClip(np.array(underline_img)).set_duration(duration_per_char)
                         clips.append(u_clip)
 
-                    final_np = np.array(underline_img)
+                    final_np = np.array(bg_with_text)
                     final_duration = final_pause_duration if current_line_num == line_total else 0.01
-                    final_clip = ImageClip(final_np).set_duration(final_duration)
-                    clips.append(final_clip)
+                    clips.append(ImageClip(final_np).set_duration(final_duration))
 
                     if current_line_num == line_total:
-                        hold_clip = ImageClip(final_np).set_duration(last_pose)
-                        clips.append(hold_clip)
-
-                    prev_line_states.append(underline_img.copy())
-
-                    # ✅ 最終状態の背景画像を保持
-                    bg_with_text = underline_img.copy()
+                        clips.append(ImageClip(final_np).set_duration(last_pose))
                     break
 
                 clips.append(composite)
 
             line_offset += 1
 
+    last_y = start_y + line_offset * line_height
+
+    if not with_animation:
+        final = ImageClip(np.array(bg_with_text)).set_duration(last_pose)
+        return final, bg_with_text, last_y
+
     final = concatenate_videoclips(clips, method="compose")
-    last_y = start_y + line_offset * line_height  # 追加
-    return final, bg_with_text, last_y  # ✅ アニメーション + 最終状態の背景画像
+    return final, bg_with_text, last_y
