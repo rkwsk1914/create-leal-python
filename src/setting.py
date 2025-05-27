@@ -3,7 +3,7 @@ base_duration = 0.2
 
 pencil_padding = 107
 
-default_page_last_pose = 1
+default_page_last_pose = 2
 
 note_line_heigh = 114
 

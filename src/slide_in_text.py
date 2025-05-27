@@ -48,11 +48,12 @@ def slide_in_text(
     final_x=100,
     font_color=(85, 85, 85, 255),
     last_pose=default_page_last_pose,
-    underline_fill=(254, 171, 36, int(255 * 1)), #(123, 182, 255, int(255 * 1)), #(251, 141, 141, 255),
+    underline_fill=(254, 171, 36, int(255 * 1)),
     underline_width=20,
     underline_anim_duration=0.03,
     underline_frame_duration=0.03,
-    underline_offset_y = 12
+    underline_offset_y=12,
+    with_animation=True  # ← アニメーション有無を切り替え
 ):
     font = ImageFont.truetype(font_path, font_size)
     w, h = bg_copy.size
@@ -65,11 +66,9 @@ def slide_in_text(
         if isinstance(item, str):
             segments = parse_underlined_segments(item)
 
-            # 初期幅でwrap
             current_max_width = max_text_width
             wrapped_lines = split_segments_by_width(segments, font, current_max_width)
 
-            # 行数を元にY位置を予測して、しきい値を超えるなら再wrap
             estimated_total_y = start_y + line_offset * line_height + len(wrapped_lines) * line_height
             if estimated_total_y >= narrow_threshold_y:
                 current_max_width = max_text_width_narrow
@@ -93,18 +92,22 @@ def slide_in_text(
                 text_np = np.array(text_img)
                 text_clip = ImageClip(text_np).set_duration(slide_duration)
 
-                def slide_pos_gen(y_pos, clip_w=text_img.width):
-                    def slide_pos(t):
-                        progress = min(t / slide_duration, 1.0)
-                        x = -clip_w + progress * (final_x + clip_w)
-                        return (x, y_pos)
-                    return slide_pos
+                if with_animation:
+                    def slide_pos_gen(y_pos, clip_w=text_img.width):
+                        def slide_pos(t):
+                            progress = min(t / slide_duration, 1.0)
+                            x = -clip_w + progress * (final_x + clip_w)
+                            return (x, y_pos)
+                        return slide_pos
 
-                animated_clip = text_clip.set_position(slide_pos_gen(y))
+                    animated_clip = text_clip.set_position(slide_pos_gen(y))
+                else:
+                    animated_clip = text_clip.set_position((final_x, y))
+
                 bg_clip = ImageClip(np.array(final_bg)).set_duration(slide_duration)
                 clips.append(CompositeVideoClip([bg_clip, animated_clip], size=(w, h)))
 
-                # 背景に文字だけ描画（下線は後で）
+                # 背景に文字描画（下線は後で）
                 draw_final = ImageDraw.Draw(final_bg)
                 x_cursor = final_x
                 for char, underline in line:
@@ -126,16 +129,17 @@ def slide_in_text(
             y = start_y + line_offset * line_height
 
             image_clip = ImageClip(np.array(image)).set_duration(slide_duration)
+            if with_animation:
+                def slide_pos_image(t):
+                    progress = min(t / slide_duration, 1.0)
+                    x = -img_w + progress * (final_x + img_w)
+                    return (x, y)
+                animated_clip = image_clip.set_position(slide_pos_image)
+            else:
+                animated_clip = image_clip.set_position((final_x, y))
 
-            def slide_pos_image(t):
-                progress = min(t / slide_duration, 1.0)
-                x = -img_w + progress * (final_x + img_w)
-                return (x, y)
-
-            animated_clip = image_clip.set_position(slide_pos_image)
             bg_clip = ImageClip(np.array(final_bg)).set_duration(slide_duration)
             clips.append(CompositeVideoClip([bg_clip, animated_clip], size=(w, h)))
-
             final_bg.paste(image, (final_x, y), image)
             line_offset += 1
 
@@ -144,22 +148,23 @@ def slide_in_text(
         for start_x, end_x, y_pos in info["positions"]:
             width = end_x - start_x
             frames = int(underline_anim_duration / underline_frame_duration)
-            for i in range(1, frames + 1):
-                underline_img = final_bg.copy()
-                draw = ImageDraw.Draw(underline_img)
-                curr_width = int(width * (i / frames))
-                underline_y = y_pos + underline_offset_y
+            underline_y = y_pos + underline_offset_y
 
-                draw.line(
-                    [(start_x, underline_y), (start_x + curr_width, underline_y)],
-                    fill=underline_fill,
-                    width=underline_width
-                )
-                clips.append(ImageClip(np.array(underline_img)).set_duration(underline_frame_duration))
+            if with_animation:
+                for i in range(1, frames + 1):
+                    underline_img = final_bg.copy()
+                    draw = ImageDraw.Draw(underline_img)
+                    curr_width = int(width * (i / frames))
+                    draw.line(
+                        [(start_x, underline_y), (start_x + curr_width, underline_y)],
+                        fill=underline_fill,
+                        width=underline_width
+                    )
+                    clips.append(ImageClip(np.array(underline_img)).set_duration(underline_frame_duration))
 
             draw_final = ImageDraw.Draw(final_bg)
             draw_final.line(
-                [(start_x, underline_y), (start_x + curr_width, underline_y)],
+                [(start_x, underline_y), (start_x + width, underline_y)],
                 fill=underline_fill,
                 width=underline_width
             )

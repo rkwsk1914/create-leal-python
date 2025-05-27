@@ -10,10 +10,14 @@ import os
 def generate_scene_top(
     character_type: Character_type,
     chara_animation: Chara_animation,
-    title: List[str]
+    title: List[str],
+    with_animation=True,
 ):
     page_last_pose = default_page_last_pose
     bg_base = Image.open(bg_image_path).convert("RGBA")
+
+    if not with_animation:
+        chara_animation = "none"
 
     character_intro, bg_with_character = enter_character(
         bg_copy=bg_base,
@@ -29,7 +33,8 @@ def generate_scene_top(
         start_x = 100,
         start_y = 506,
         max_text_width = 800,
-        last_pose=page_last_pose
+        last_pose=1,
+        with_animation=with_animation
     )
 
     os.makedirs("dist", exist_ok=True)

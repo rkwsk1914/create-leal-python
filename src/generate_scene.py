@@ -21,9 +21,13 @@ def generate_scene(
     chara_animation: Chara_animation,
     title: List[str],
     contents: List[str],
+    with_animation=True
 ):
     page_last_pose = default_page_last_pose
     bg_base = Image.open(bg_image_path).convert("RGBA")
+
+    if not with_animation:
+        chara_animation = "none"
 
     character_intro, bg_with_character = enter_character(
         bg_copy=bg_base,
@@ -40,6 +44,7 @@ def generate_scene(
         start_x=100,
         start_y=470,
         max_text_width=880,
+        with_animation=with_animation,
     )
 
     # 💡 Y座標で narrow_after_lines の判定を動的に行う
@@ -62,6 +67,7 @@ def generate_scene(
         max_text_width=max_text_width,
         font_size=font_size,
         last_pose=page_last_pose,
+        with_animation=with_animation,
     )
 
     os.makedirs("dist", exist_ok=True)
