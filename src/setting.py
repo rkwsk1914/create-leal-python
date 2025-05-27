@@ -1,8 +1,6 @@
 default_fps = 30
 base_duration = 0.2
 
-pencil_padding = 141
-
 default_page_last_pose = 1
 
 note_line_heigh = 114
