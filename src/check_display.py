@@ -1,7 +1,7 @@
 import sys
 import json
 from moviepy.editor import concatenate_videoclips
-from scene_top import generate_scene_top
+from generate_scene_top import generate_scene_top
 from generate_scene import generate_scene
 from my_transitions import make_page_flip
 from setting import default_fps
@@ -50,10 +50,14 @@ except Exception as e:
 scenes = []
 
 for content_item in contents:
+    leal_title = content_item["leal_title"]
+    leal_number = content_item["leal_number"]
+
     scenes.append(lambda item=content_item: generate_scene_top(
         character_type=item["chara_type"],
         chara_animation=item["chara_animation"],
-        title=item["lead_title"],
+        title=item["leal_title"],
+        leal_number=item["leal_number"],
         with_animation=False
     ))
 
@@ -64,6 +68,8 @@ for content_item in contents:
                 chara_animation=block["chara_animation"],
                 title=[block["title"]],
                 contents=block["content"],
+                leal_title=leal_title,
+                leal_number=leal_number,
                 with_animation=False
             )
         scenes.append(make_block_func())

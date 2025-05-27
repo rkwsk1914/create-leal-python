@@ -4,6 +4,7 @@ from setting import default_fps, bg_image_path, default_page_last_pose
 from content import Chara_animation
 from character_setting import Character_type
 from write_title import write_title
+from add_label_overlay import add_label_overlay
 from enter_character import enter_character
 import os
 
@@ -11,10 +12,13 @@ def generate_scene_top(
     character_type: Character_type,
     chara_animation: Chara_animation,
     title: List[str],
+    leal_number,
     with_animation=True,
 ):
-    page_last_pose = default_page_last_pose
+    page_last_pose = 1
     bg_base = Image.open(bg_image_path).convert("RGBA")
+
+    bg_base = add_label_overlay(bg_base, leal_number=leal_number)
 
     if not with_animation:
         chara_animation = "none"
@@ -33,7 +37,7 @@ def generate_scene_top(
         start_x = 100,
         start_y = 506,
         max_text_width = 800,
-        last_pose=1,
+        last_pose=page_last_pose,
         with_animation=with_animation
     )
 
@@ -45,10 +49,11 @@ if __name__ == "__main__":
     final = generate_scene_top(
         character_type="surprised",
         chara_animation="jump",
+        leal_number="#02",
         title=[
             "それって",
             "タンパク質",
             "不足かも！"
         ]
     )
-    final.write_videofile("dist/scene_top.mp4", fps=default_fps)
+    final.write_videofile("check/scene_top.mp4", fps=default_fps)

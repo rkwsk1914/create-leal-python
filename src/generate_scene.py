@@ -1,6 +1,5 @@
-from moviepy.editor import ImageClip, CompositeVideoClip, concatenate_videoclips
 from typing import List
-from PIL import Image, ImageFont
+from PIL import Image
 import os
 
 from content import Chara_animation
@@ -10,10 +9,11 @@ from setting import (
     bg_image_path,
     default_page_last_pose,
     note_line_heigh,
-    font_path,
 )
+
+from add_label_overlay import add_label_overlay
 from write_title import write_title
-from slide_in_text import slide_in_text, parse_underlined_segments, split_segments_by_width
+from slide_in_text import slide_in_text
 from enter_character import enter_character
 
 def generate_scene(
@@ -21,10 +21,14 @@ def generate_scene(
     chara_animation: Chara_animation,
     title: List[str],
     contents: List[str],
-    with_animation=True
+    leal_title: List[str],
+    leal_number,
+    with_animation=True,
 ):
     page_last_pose = default_page_last_pose
     bg_base = Image.open(bg_image_path).convert("RGBA")
+
+    bg_base = add_label_overlay(bg_base, leal_title=leal_title, leal_number=leal_number)
 
     if not with_animation:
         chara_animation = "none"
@@ -77,6 +81,12 @@ if __name__ == "__main__":
     final = generate_scene(
         character_type="agree",
         chara_animation="none",
+        leal_number="#02",
+        leal_title=[
+            "それって",
+            "タンパク質",
+            "不足かも！"
+        ],
         title=["体内の電気は“自家発電”！？"],
         contents=[
             "心臓は自律神経と電気信号で24時間動き続けてる！",
@@ -92,4 +102,4 @@ if __name__ == "__main__":
         #     # {"image": "add_asset/maru.png"},
         # ]
     )
-    final.write_videofile("dist/scene_one_6.mp4", fps=default_fps)
+    final.write_videofile("check/scene_one.mp4", fps=default_fps)
